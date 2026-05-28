@@ -226,8 +226,8 @@ cps/
 `cps` requires Python 3.8+ and relies exclusively on `numpy` and `scipy` .
 
 ```bash
-git clone https://github.com/JPQ-exp/cps-core.git
-cd cps-core
+git clone https://github.com/JPQ-exp/cps.git
+cd cps
 pip install -r requirements.txt
 ```
 
