@@ -1,3 +1,5 @@
+![CPS Stabilization Results](assets/cps_stabilization_results.png)
+
 # `cps` — Coupled Persistence System
 
 `cps` is a Python library for viability-aware coordination, resource allocation, and algebraic stabilization of autonomous dynamical systems . 
