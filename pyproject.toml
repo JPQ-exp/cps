@@ -20,6 +20,5 @@ dependencies = [
 ]
 
 [tool.setuptools]
-# Explicitly list the packages to bypass automatic discovery bugs
+# Explicitly list the packages to prevent any setuptools find-discovery errors
 packages = ["cps", "cps.core"]
-include = ["cps*"]
