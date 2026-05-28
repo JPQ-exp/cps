@@ -247,6 +247,8 @@ pip install .
 * **The Coupled Persistence System (Eq 16):** Dictates final coordinated velocity trajectories:
   $$\dot{x} = \mathbf{P} \cdot \nabla V^*$$
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20432940)](https:doi.org/10.5281/zenodo.20432940)
+
 ---
 
 ## 6. License
