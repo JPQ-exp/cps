@@ -227,7 +227,7 @@ cps/
 
 ```bash
 git clone https://github.com/JPQ-exp/cps-core.git
-cd cps
+cd cps-core
 pip install -r requirements.txt
 ```
 
