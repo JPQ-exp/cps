@@ -229,6 +229,7 @@ cps/
 git clone https://github.com/JPQ-exp/cps.git
 cd cps
 pip install -r requirements.txt
+pip install .
 ```
 
 ---
