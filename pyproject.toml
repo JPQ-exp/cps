@@ -13,13 +13,13 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Scientific/Engineering",
 ]
 dependencies = [
     "numpy>=1.20.0",
     "scipy>=1.7.0"
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
+[tool.setuptools]
+# Explicitly list the packages to bypass automatic discovery bugs
+packages = ["cps", "cps.core"]
 include = ["cps*"]
