@@ -318,6 +318,7 @@ pip install .
   $$\nabla V^*(x, R, z) = \frac{\nabla\Pi(x)}{\|\nabla\Pi(x)\|_2 + \epsilon} + \frac{\sqrt{\beta \psi(x)}}{\sqrt{\alpha R}} [\mathcal{E}(x,z,e) + \mathcal{R}(x,M)]$$
 * **The Coupled Persistence System (Eq 16):** Dictates final coordinated velocity trajectories:
   $$\dot{x} = \mathbf{P} \cdot \nabla V^*$$
+
 * **Biological principle of least action(BPLA) (Eq 9):** Dictates action, direction and urgency, is normally found rearranged:
   $$\mathcal{A}(x, R) = \sqrt{\frac{\alpha R}{\beta}} \cdot \frac{\nabla \Pi(x)}{\|\nabla \Pi(x)\|_2 + \epsilon} \cdot \frac{1}{\psi(x)}$$
 
