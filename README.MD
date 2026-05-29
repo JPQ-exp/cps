@@ -203,6 +203,68 @@ for step in range(5):
     print(f"Hour {step} | Temp Dev: {state[0]:.2f}C | Hydration: {state:.2f} | Reserve Energy: {organism.reserve:.2f}")
 ```
 
+## 🔋 Extracting the Metabolic Layer (BPLA) for Standalone Use
+
+You do not need to use the full `Coordinator` orchestration loop to benefit from the library's resource-aware safety math . You can extract the **Biological Principle of Least Action (BPLA)** layer directly to use as a standalone safety filter in your own projects .
+
+### Standalone Use Case: Thermal Throttling in an IoT Edge Camera
+Imagine an edge-computing camera running object detection. 
+* **State ($x$):** CPU Temperature (must remain below $80^\circ\text{C}$ to avoid damage) .
+* **Reserve ($R$):** Remaining Battery Capacity ($0.0$ to $10.0$ Ah) .
+* **BPLA Action ($\mathcal{A}$):** Dynamically scales down the frame processing rate (cool-down effort) strictly proportional to how close the CPU is to overheating, weighted by how much battery life remains .
+
+Here is how to compute this vector directly by calling `cps` core primitives :
+
+```python
+import numpy as np
+from cps import ViabilityField
+from cps.core.gradients import normalized_gradient
+
+# 1. Define the safety boundary (CPU temperature must remain under 80C)
+def cpu_thermal_boundary(state: np.ndarray) -> float:
+    # State[0] is current CPU temperature
+    return 80.0 - state[0]
+
+# Instantiate the viability field to handle margins and gradients 
+thermal_field = ViabilityField(boundary_fn=cpu_thermal_boundary)
+
+# 2. Create the standalone BPLA function (Equation 9) 
+def compute_bpla_action(
+    temperature_state: np.ndarray, 
+    battery_reserve: float, 
+    alpha: float = 1.2, 
+    beta: float = 0.5,
+    eps: float = 1e-6
+) -> np.ndarray:
+    """
+    Computes the optimal boundary-avoiding action vector directly.
+    """
+    # Evaluate current safety margin psi(x) and raw gradient 
+    psi = thermal_field.margin(temperature_state)
+    raw_gradient = thermal_field.gradient(temperature_state)
+    
+    # Normalize the direction to keep control forces bounded 
+    norm_grad = normalized_gradient(raw_gradient, eps=eps)
+    
+    # Calculate the BPLA action magnitude:
+    # Action scales with available reserves and inversely with safety margin 
+    action_scale = np.sqrt((alpha * battery_reserve) / beta) * (1.0 / (max(psi, 0.0) + eps))
+    
+    return action_scale * norm_grad
+
+# --- Test the Standalone Filter ---
+# Case A: CPU is cool (50C) and battery is full (10.0 Ah)
+cool_state = np.array([50.0])
+action_a = compute_bpla_action(cool_state, battery_reserve=10.0)
+
+# Case B: CPU is hot (79.5C) and battery is low (1.5 Ah)
+hot_state = np.array([79.5])
+action_b = compute_bpla_action(hot_state, battery_reserve=1.5)
+
+print(f"Cool CPU (Low Urgency) -> Frame throttling action: {action_a[0]:.4f} units")
+print(f"Hot CPU  (High Urgency) -> Frame throttling action: {action_b[0]:.4f} units")
+´´´
+
 ---
 
 ## 3. Package Structure
