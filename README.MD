@@ -263,7 +263,7 @@ action_b = compute_bpla_action(hot_state, battery_reserve=1.5)
 
 print(f"Cool CPU (Low Urgency) -> Frame throttling action: {action_a[0]:.4f} units")
 print(f"Hot CPU  (High Urgency) -> Frame throttling action: {action_b[0]:.4f} units")
-´´´
+```
 
 ---
 
