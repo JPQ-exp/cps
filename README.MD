@@ -394,6 +394,12 @@ Control theory asks how to drive a system to a target. `cps` asks how a system s
 The math resembles control theory because both disciplines borrowed the same tools from physics. The reasoning runs in the opposite direction.
 
 ---
+ 
+## A Note on Scope
+ 
+It is within the hopes of the authors that `cps` proves useful beyond practical applications, and finds relevance at the scientific frontier — including autonomous systems operating under extreme resource constraint and communication latency, such as Mars rover technology and deep sea drone exploration.
+
+---
 
 [![DOI](https://doi.org/10.5281/zenodo.20432941)](https://doi.org/10.5281/zenodo.20432940)
 
