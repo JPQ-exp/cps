@@ -383,6 +383,18 @@ pip install .
 * **Biological principle of least action(BPLA) (Eq 9):** Dictates action, direction and urgency, is normally found rearranged:
   $$\mathcal{A}(x, R) = \sqrt{\frac{\alpha R}{\beta}} \cdot \frac{\nabla \Pi(x)}{\|\nabla \Pi(x)\|_2 + \epsilon} \cdot \frac{1}{\psi(x)}$$
 
+---
+ 
+## Footnote: On Origins
+ 
+`cps` is often read as a control theory framework due to its use of differential equations and vector fields. The resemblance is superficial. The framework's core question — *how does a system persist under resource constraint and environmental pressure* — is a biological one, closer to Ashby's cybernetics and Maturana & Varela's autopoiesis than to classical control theory.
+ 
+Control theory asks how to drive a system to a target. `cps` asks how a system stays alive long enough to act. The viability field is not a setpoint — it is a survival boundary. The reserve is not a state variable — it is the metabolic condition for action. The persistence operator does not minimize error — it scales effort to what the system can afford.
+ 
+The math resembles control theory because both disciplines borrowed the same tools from physics. The reasoning runs in the opposite direction.
+
+---
+
 [![DOI](https://doi.org/10.5281/zenodo.20432941)](https://doi.org/10.5281/zenodo.20432940)
 
 ---
