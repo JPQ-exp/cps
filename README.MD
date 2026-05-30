@@ -267,6 +267,67 @@ print(f"Hot CPU  (High Urgency) -> Frame throttling action: {action_b[0]:.4f} un
 
 ---
 
+# Oscillation Damping in CPS
+ 
+## What it is
+ 
+Oscillation damping is the mechanism that prevents a controlled agent from flip-flopping direction faster than the system can act on. In CPS terms, an oscillation is a sign change in a state dimension — the velocity in x going from positive to negative and back — within a short time window. The `InstabilityError` fires when this rate exceeds 0.4 crossings per step, because beyond that threshold the system is reacting faster than it can stabilize, and the trajectory becomes formally unpredictable.
+ 
+---
+ 
+## Why it happens
+ 
+It is a structural consequence of having multiple competing repulsion sources. When the dragon is to the left and a minion is to the right, the raw drift vector in x is the sum of two opposing forces. Depending on which is closer at any given frame, the dominant direction can flip — not because the agent is making a decision, but because the geometry of the inputs changed by a few pixels. Without damping, this produces rapid sign alternation in the projected velocity, which the COL alone cannot fully suppress because the COL resolves antagonistic components but does not track history across frames.
+ 
+---
+ 
+## The fix and why order matters
+ 
+The clamp operates on a rolling window of sign history. If allowing a new flip would push the rate above 0.39, that dimension is held at its current sign — the magnitude still changes freely, only the crossing is suppressed.
+ 
+The critical insight is **where in the pipeline** to apply it:
+ 
+```python
+# Wrong: COL still receives oscillating inputs on the next frame
+safe_vel = self.col.project(self._clamp_oscillation(self.col.project(raw_drift)))
+ 
+# Right: COL always receives a sign-stable input
+safe_vel = self.col.project(self._clamp_oscillation(raw_drift))
+```
+ 
+Clamping after projection meant the COL was still receiving oscillating inputs on the next frame — the clamp was cleaning up a signal that had already influenced the COL's internal state. Clamping before projection means the COL always receives a sign-stable input, so its own hysteresis and the clamp reinforce each other rather than fighting.
+ 
+---
+ 
+## When you need it
+ 
+Oscillation damping becomes necessary when three conditions coincide:
+ 
+**Multiple repulsion sources with overlapping ranges.** A single threat produces a monotonic repulsion vector — it pushes consistently in one direction. Two or more threats on opposite sides produce a tug-of-war in the raw drift that can cross zero every few frames.
+ 
+**High update frequency relative to agent speed.** At 60 Hz, an agent moving at 275 px/s covers ~4.6 pixels per frame. Two threats 9 pixels apart on opposite sides can swap dominance every other frame. Lower framerates or slower agents reduce this — the geometry changes less between steps, so flips are rarer.
+ 
+**Tight viable corridors.** If the agent has room to maneuver, the COL naturally finds an escape vector that does not require rapid direction reversal. Oscillation becomes acute when the agent is cornered — walls on one side, enemies on the other — and the viable movement space collapses to a narrow band where any small perturbation flips the dominant direction.
+ 
+---
+ 
+## When you don't need it
+ 
+With a single threat source, or threats that are spatially separated enough that only one dominates at a time, the raw drift vector changes slowly and the COL's hysteresis threshold alone is sufficient. The original single-dragon game never triggered the instability because there was never a frame where a competing source flipped the dominant direction. Oscillation damping can be treated as a safeguard that costs nothing when inactive and engages automatically when the geometry gets hostile.
+ 
+---
+ 
+## The broader implication
+ 
+This is why oscillation damping belongs at the **input** to the constraint resolution layer, not the output. The constraint resolver (COL) is stateless with respect to direction history — it sees one frame at a time. The damper is the memory layer that sits in front of it, ensuring the COL operates on a signal that is already geometrically coherent across time. Together they form a two-stage filter: the damper handles temporal coherence, the COL handles spatial coherence.
+ 
+```
+raw_drift  →  _clamp_oscillation()  →  col.project()  →  velocity
+              (temporal coherence)     (spatial coherence)
+```
+
+---
+
 ## 3. Package Structure
 
 ```text
