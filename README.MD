@@ -354,6 +354,23 @@ cps/
 
 ---
 
+### 3.1 Primitives: The Automaton Class
+
+The `Automaton` class is the central, state-carrying process of the system. It enforces viability constraints by tying physical coordinates directly to metabolic health.
+
+#### Constructor Parameters:
+* **`state`** (`np.ndarray`): The initial multi-dimensional continuous state vector of the agent.
+* **`reserve`** (`float`): The starting metabolic resource budget (e.g., battery, currency, or energy).
+* **`viability_field`** (`ViabilityField`): The mathematical boundary representing the safe operating envelope.
+* **`min_reserve`** (`float`, default=`1e-4`): The resource floor. If `reserve` falls below this threshold, the `Coordinator` automatically suppresses corrective actions to preserve baseline systemic integrity.
+
+#### Properties & Methods:
+* **`observe()`** -> `np.ndarray`: Returns the active state vector.
+* **`reserve`** -> `float`: Returns the current remaining metabolic resources.
+* **`alive`** -> `bool`: Evaluates to `True` if the agent's current state resides within the `ViabilityField` boundary ($\psi(x) \ge 0$) AND its remaining reserve is strictly greater than `min_reserve`.
+
+---
+
 ## 4. Installation
 
 `cps` requires Python 3.8+ and relies exclusively on `numpy` and `scipy` .
