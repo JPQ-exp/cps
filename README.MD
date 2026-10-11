@@ -6,6 +6,37 @@ Operating on generic vector spaces, `cps` bridges continuous-discrete state tran
 
 ## Results
 
+## Benchmark: Viability Phase Transition under Sensory Latency ($\tau = 12$)
+
+When autonomous agents operate under feedback latency and external environmental drift, standard controllers suffer from **delay-induced limit-cycle bifurcations**—frantically over-correcting, wasting metabolic energy, and risking boundary collapse.
+
+The figure below shows a sweep of three viability boundaries ($R = 1.0, 1.5, 2.0$) comparing an unconstrained **Delayed Baseline** against the **Coupled Persistence System (CPS-COL)** under identical latency ($\tau = 12$ steps) and constant outward drift ($\mathcal{E} = [1.1, 0.8]$):
+
+![Phase Transition in Viability](assets/cps_three_regimes_phase_transition.png)
+
+> **Reproduce this benchmark:** `python examples/benchmark_phase_transition.py`
+
+---
+
+### The Three Dynamical Regimes
+
+| Regime | Boundary Scale | Baseline Behavior (Standard Control) | CPS-COL Behavior (Our Framework) | Theoretical Meaning |
+| :--- | :---: | :--- | :--- | :--- |
+| **1. Sub-Critical** | $R = 1.0$ | **Lysis Breach ($t \approx 1.2\text{s}$)**<br>Immediate catastrophic failure. | **Chatters & Breaches ($t \approx 7.5\text{s}$)**<br>Extends survival by $6\times$, but collapses. | **Empty Viability Kernel ($\mathrm{Viab}(K) = \emptyset$):** Boundary is smaller than latency stopping distance ($\Delta r < \|v\|\tau \Delta t$). Physical survival is mathematically impossible. |
+| **2. Critical** | $R = 1.5$ | **Trapped in Limit-Cycle ($40\text{ Hz}$)**<br>Oscillates indefinitely; reserves deplete to near zero. | **Navigates to Center & Survives**<br>Hugs safe margin; reserves build to $+12.0$. | **The Attractor Trap:** Boundary fits the overshoot orbit. Baseline enters a dissipative Hopf limit cycle. CPS deflects along the inner boundary. |
+| **3. Robust** | $R = 2.0$ | **Perpetual Limit Cycle**<br>High-frequency co-contraction; drains $2\times$ more fuel/sec. | **Point Attractor Resolution**<br>Limit cycle collapsed to stable homeostatic fixed point. | **Homeostatic Clearance:** With sufficient clearance, algebraic orthant projection (COL) eliminates jitter and locks onto the point attractor $(M^*, c^*)$. |
+
+---
+
+### Key Takeaways for Autonomous Systems
+
+1. **Why Standard Control Fails (The Red Trajectories):**  
+   Sensory latency $\tau$ induces high-frequency antagonistic command fighting (**metabolic jitter**). Even when the baseline avoids a spatial crash (as in $R = 1.5$ and $R = 2.0$), it commits **energetic suicide**—burning its entire metabolic reserve $R$ on wasted actuation.
+2. **Why CPS-COL Succeeds (The Blue Trajectories):**  
+   * **BPLA Urgency ($1/\psi \to \infty$):** As the boundary approaches, repulsive control forces scale nonlinearly, actively preventing boundary breach.
+   * **Constrained Orthant Lattice (COL):** Enforces algebraic mutual exclusion on opposing actuators ($T^+_i \odot T^-_i = \mathbf{0}$), eliminating the $40\text{ Hz}$ jitter.
+   * **Temporal Damping:** Clamping sign alternations *before* projection prevents delay-induced limit cycles, collapsing oscillatory orbits into quiet point attractors.
+
 Running the tutorial produces the following behavior — the agent 
 navigates toward the center under constant drift and noise, 
 never crossing the viability boundary:
